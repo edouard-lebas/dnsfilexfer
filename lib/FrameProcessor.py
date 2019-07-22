@@ -23,7 +23,7 @@
 import hashlib
 import os.path
 
-from Crypt import CryptString
+from lib.Crypt import CryptString
 
 
 class ProcessFrame:
@@ -51,23 +51,23 @@ class ProcessFrame:
             self.secret = secret
 
     def process(self):
-        print '[INFO] Processing frame', self.frame
+        print('[INFO] Processing frame', self.frame)
 
         try:
             frame_pos = int(self.frame[0:4])
-        except Exception, e:
-            print '[CRITICAL] Unable to determine a position. Error:', str(e)
-            print '[CRITICAL] Maybe we are not getting a message really or `-X` was used with the sender.'
+        except Exception as e:
+            print('[CRITICAL] Unable to determine a position. Error:', str(e))
+            print('[CRITICAL] Maybe we are not getting a message really or `-X` was used with the sender.')
             return
 
         # first of all, check of this is not the last frame
         if len(str(self.frame).replace('0', '')) == 0:
 
             # check that we got all of the parts of the message
-            if self.expected <> self.position:
-                print '[ERROR] EOF received but complete message was not received.'
-                print '[ERROR] Expected:', self.expected
-                print '[ERROR] Position:', self.position
+            if self.expected != self.position:
+                print('[ERROR] EOF received but complete message was not received.')
+                print('[ERROR] Expected:', self.expected)
+                print('[ERROR] Position:', self.position)
                 return
 
             # merge the payloads, and checksum the result
@@ -76,32 +76,32 @@ class ProcessFrame:
 
             if self.checksum == checksum:
 
-                print '[OK] Message seems to be intact and passes sha1 checksum of', self.checksum
-                print '[OK] Message was received in', self.expected + 2, 'requests'
+                print('[OK] Message seems to be intact and passes sha1 checksum of', self.checksum)
+                print('[OK] Message was received in', self.expected + 2, 'requests')
 
                 # check if self.encrypted & if a key is available.
                 # if so, decrypt combined_payloads
                 if self.encrypted:
                     if not self.secret:
-                        print '[CRITICAL] Message is encrypted, but no secret is available. Set one with `-s`'
+                        print('[CRITICAL] Message is encrypted, but no secret is available. Set one with `-s`')
                         return
 
                     # decrypt the message
                     d = CryptString(self.secret)
                     combined_payloads = d.decode(combined_payloads)
                     if not combined_payloads:
-                        print '[ERROR] Encrypted message failed to decode'
+                        print('[ERROR] Encrypted message failed to decode')
                         return
 
-                    print '[INFO] Message has been decrypted with the configured secret'
+                    print('[INFO] Message has been decrypted with the configured secret')
 
                 # if we need to write this too a file, do it
                 if self.out_file:
-                    print '[OK] Writing contents to', self.out_file
+                    print('[OK] Writing contents to', self.out_file)
 
                     # check if self.out_file already exists.
                     if os.path.isfile(self.out_file):
-                        print '[INFO]', self.out_file, 'already exists.'
+                        print('[INFO]', self.out_file, 'already exists.')
 
                         if self.identifier:
                             self.out_file = self.out_file + '-' + self.identifier
@@ -109,22 +109,22 @@ class ProcessFrame:
                             self.out_file = self.out_file + '-' + self.checksum[:8]
 
                     # open the file and write the message
-                    print '[INFO] Writing to', repr(os.path.abspath(self.out_file))
+                    print('[INFO] Writing to', repr(os.path.abspath(self.out_file)))
 
                     with open(os.path.abspath(str(self.out_file)), 'w') as f:
                         f.write(combined_payloads)
 
-                    print '[OK] Done writing contents to', self.out_file
+                    print('[OK] Done writing contents to', self.out_file)
 
                 # else, just print it
                 else:
-                    print 'Message identifier:', self.identifier, '\n'
-                    print '---START OF MESSAGE---'
-                    print combined_payloads
-                    print '---END OF MESSAGE---'
+                    print('Message identifier:', self.identifier, '\n')
+                    print('---START OF MESSAGE---')
+                    print(combined_payloads)
+                    print('---END OF MESSAGE---')
 
             else:
-                print '[CRITICAL] Message does not pass checksum validation. Receive Failed.'
+                print('[CRITICAL] Message does not pass checksum validation. Receive Failed.')
                 self.position = 0
                 self.expected = 0
                 self.framestore = []
@@ -134,10 +134,12 @@ class ProcessFrame:
         # new input starting, read the amount of expected frames
         if frame_pos == 0:
             # split by : and and get the number of extected frames, minus this one
-            self.expected = int(self.frame.split(':')[0])
+            # Added b
+            self.expected = int(self.frame.split(b':')[0])
 
             # check if the received message will be encrypted
-            if int((self.frame.split(':')[1])[:1]) == 1:
+            # Added b
+            if int((self.frame.split(b':')[1])[:1]) == 1:
                 self.encrypted = True
 
             self.position = 0
@@ -168,4 +170,4 @@ class ProcessFrame:
             self.framestore.append(self.frame[4:])
             return
 
-        print '[WARNING]: Out of sync frames received! We are expecting frame', self.position + 1, 'but got', frame_pos
+        print('[WARNING]: Out of sync frames received! We are expecting frame', self.position + 1, 'but got', frame_pos)
